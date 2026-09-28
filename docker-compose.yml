@@ -1,0 +1,38 @@
+services:
+  django:
+    container_name: newkala_website
+    build:
+      context: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    restart: unless-stopped
+  db:
+    image: postgres:16-alpine
+
+    container_name: newkala_website_db
+    env_file:
+      - .env
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+    ports:
+      - "5432:5432"
+
+    restart: unless-stopped
+
+
+volumes:
+  postgres_data:

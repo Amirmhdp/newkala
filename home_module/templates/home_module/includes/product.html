@@ -1,0 +1,21 @@
+{% load poll_extras %}
+
+{% for product in products %}
+    <div class="{% if not product.discount.is_active %}flex{% endif %} product-hover bg-white h-[206px] md:h-[253px] w-[147px] md:w-[187px] shrink-0 px-2 md:px-3 py-1 border border-gray-300 rounded-lg" style="box-shadow:var(--shadow)">
+        <a href="{{ product.get_absolute_url }}" class="{% if not product.discount.is_active %} gap-3 {% endif %}flex flex-col justify-center gap-1 md:gap-3 items-center w-full">
+            <img src="{{ product.image.url }}" class="w-28 md:w-[89%]" alt="">
+            <p class=' text-xs text-gray-500 line-clamp-2 text-right w-full'>{{ product.title_fa }}</p>
+            <div class="flex flex-col justify-center gap-1 w-full md:px-2">
+                <div class="flex items-center justify-between">
+                    {% if product.discount.is_active %}
+                        <span class="px-1 rounded-lg bg-red-600 text-white text-sm font-bold">{{ product.discount.discount_value }}%</span>
+                    {% endif %}
+                    <span
+                        class="{% if not product.discount.is_active %}text-sm text-end text-gray-800{% endif %} font-bold {% if product.discount.is_active %}line-through text-xs{% endif %} text-gray-500 whitespace-nowrap">{{ product.price|three_digits_currency }}
+                        تومانءء</span>
+                </div>
+                {% if product.discount.is_active %}<span class="text-sm font-bold text-gray-800 whitespace-nowrap text-end ">{{ product.final_price|three_digits_currency }} تومانءء</span>{% endif %}
+            </div>
+        </a>
+    </div>
+{% endfor %}

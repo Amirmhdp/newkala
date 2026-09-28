@@ -1,0 +1,14 @@
+{% load static %}
+{% if request.user.is_authenticated %}
+    <span id="wishes">
+        {% if favorite %}
+            <img src="{% static 'img/heart-svgrepo-com%20(1).svg' %}"
+                 onclick="addToWishesList({{ product.id }})"
+                 class="cursor-pointer" width="25px" alt="heart-icon">
+        {% else %}
+            <img src="{% static 'img/heart-svgrepo-com%20(2).svg' %}"
+                 onclick="addToWishesList({{ product.id }})"
+                 class="cursor-pointer" width="25px" alt="heart-icon">
+        {% endif %}
+    </span>
+{% endif %}

@@ -1,0 +1,260 @@
+{% load static %}
+
+<header id="header" class="mb-[40px] md:mb-[15px]" >
+  <div id="header-fixed">
+
+    <!-- ── TOP ROW ── -->
+    <div class="header-top">
+
+      <!-- logo (desktop) -->
+      <a href="/" class="header-logo hidden lg:inline-block flex-shrink-0">
+        {% for setting in logo %}
+          <img src="{{ setting.site_logo.url }}" alt="{{ setting.site_name }}">
+        {% endfor %}
+      </a>
+
+      <!-- mobile: search icon + logo -->
+      <div class="flex items-center gap-2 lg:hidden">
+        <button onclick="openSearchBox()"
+          class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+          <i class="fa fa-search text-base"></i>
+        </button>
+        {% for setting in logo %}
+            <a href="/">
+                <img src="{{ setting.site_logo.url }}" alt="{{ setting.site_name }}" style="height:35px;width:auto">
+            </a>
+        {% endfor %}
+      </div>
+
+      <!-- search (desktop) -->
+<div class="search-wrap hidden lg:inline-block" id="search-wrap-desktop">
+
+  <!-- فرم -->
+  <form action="{% url 'product_page' %}" method="get"
+        class="search-form" id="open-search-box"
+        onsubmit="handleSearchSubmit(event)">
+    <img src="{% static 'img/search-alt-svgrepo-com.svg' %}" alt="">
+    <input type="text" name="q" id="search-box-md"
+           placeholder="جستجو در نیوکالا"
+           autocomplete="off"
+           oninput="liveSearch(this.value)">
+  </form>
+
+  <!-- dropdown -->
+  <div class="hidden" id="searchbox-md">
+    <div id="search-content" class="w-full">
+
+      <!-- تاریخچه (فقط لاگین) -->
+        {% if request.user.is_authenticated %}
+        <div id="search-history-section" class="hidden overflow-hidden">
+          <div class="flex items-center gap-1 text-xs text-gray-400 font-semibold mb-2">
+            <i class="fa fa-clock-rotate-left"></i> تاریخچه جستجو
+          </div>
+          <div class="mySwiper history-swiper-desktop mb-3">
+              <div class="swiper-wrapper" id="search-history-list"></div>
+          </div>
+        </div>
+        {% endif %}
+
+      <!-- پیشنهادات لایو -->
+      <div id="search-suggestions-section" class="hidden">
+        <div class="flex items-center gap-1 text-xs text-gray-400 font-semibold mb-2">
+          <i class="fa fa-magnifying-glass"></i> پیشنهادات
+        </div>
+        <div id="search-suggestions-list"></div>
+      </div>
+
+      <!-- پرطرفدار (پیش‌فرض) -->
+      <div id="search-trending-section">
+        <div class="flex items-center gap-1 text-sm text-gray-400 font-semibold mb-2">
+          <i class="fa fa-fire text-red-400"></i> جستجوهای پرطرفدار
+        </div>
+        <div class="mySwiper overflow-hidden">
+          <div class="swiper-wrapper gap-2">
+              {% for top_search in top_searches %}
+                <a href="/product/?q={{ top_search.query }}" class="search-tag text-sm swiper-slide !w-max">{{ top_search.query }}</a>
+              {% endfor %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+      <!-- action buttons -->
+      <div class="header-actions">
+        {% if request.user.is_superuser %}
+          <a href="/admin/" class="hdr-btn hidden md:flex" title="پنل مدیریت">
+            <img src="{% static 'img/admin-users-svgrepo-com.svg' %}" alt="admin">
+          </a>
+        {% endif %}
+
+        {% if not request.user.is_authenticated %}
+          <a href="{% url 'login_page' %}" class="hdr-btn hidden md:flex">
+            <img src="{% static 'img/login-2-svgrepo-com.svg' %}" alt="login"> ورود
+          </a>
+          <a href="{% url 'register_page' %}" class="hdr-btn primary hidden md:flex">
+            ثبت‌نام
+          </a>
+        {% else %}
+          <a href="{% url 'order_page' %}" class="hdr-btn hidden md:flex" title="سبد خرید">
+            <img src="{% static 'img/shopping-card-svgrepo-com.svg' %}" alt="cart">
+            <span class="hidden md:inline">سبد خرید</span>
+          </a>
+          <a href="{% url 'user_panel_page' %}" class="hdr-btn hidden md:flex" title="پنل کاربری">
+            <img src="{% static 'img/user-svgrepo-com.svg' %}" alt="profile">
+          </a>
+          <a href="{% url 'notifications_page' %}" class="hdr-btn hidden md:flex" title="اعلان‌ها">
+            <img src="{% static 'img/notification-svgrepo-com.svg' %}" alt="notifications">
+          </a>
+        {% endif %}
+        <!-- mobile: user panel -->
+
+        {% if request.user.is_authenticated %}
+          <a href="{% url 'user_panel_page' %}" class="hdr-btn md:hidden" title="پنل کاربری">
+              <img src="{% static 'img/user-svgrepo-com.svg' %}" alt="profile">
+          </a>
+        <!-- mobile: cart -->
+          <a href="{% url 'order_page' %}" class="hdr-btn md:hidden">
+            <img src="{% static 'img/shopping-card-svgrepo-com.svg' %}" alt="cart">
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ── NAV ROW ── -->
+    <div class="header-nav">
+      <div class="nav-links">
+        <div class="mySwiper overflow-hidden">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide !w-auto overflow-hidden">
+              <div class="flex items-center gap-1">
+
+                <a href="#" class="nav-link hidden text-sm md:flex" id="btn-category"
+                   onclick="toggleCategory(event)">
+                  <img src="{% static 'img/category-svgrepo-com.svg' %}" alt=""> دسته‌بندی
+                  <i class="fa fa-chevron-down text-[9px] text-gray-400 mr-1"></i>
+                </a>
+
+                <a href="{% url 'home_page' %}" class="nav-link text-sm">
+                  <img src="{% static 'img/home-smile-angle-svgrepo-com%20(2).svg' %}" alt=""> خانه
+                </a>
+
+                <a href="{% url 'product_page' %}" class="nav-link text-sm">
+                  <img src="{% static 'img/shopping-bag-svgrepo-com.svg' %}" alt="" style="width:18px"> محصولات
+                </a>
+
+                <a href="{% url 'best_selling_page' %}" class="nav-link text-sm">
+                  <img src="{% static 'img/fire-svgrepo-com.svg' %}" alt=""> پرفروش‌ترین‌ها
+                </a>
+
+                <a href="{% url 'about_us_page' %}" class="nav-link text-sm">
+                  <img src="{% static 'img/about-svgrepo-com%20(2).svg' %}" alt=""> درباره ما
+                </a>
+
+                <a href="{% url 'contact-us-page' %}" class="nav-link text-sm">
+                  <img src="{% static 'img/contact-us-svgrepo-com.svg' %}" alt=""> تماس با ما
+                </a>
+
+              </div>
+            </div>
+          </div>
+          <div class="swiper-button-next !hidden"></div>
+          <div class="swiper-button-prev !hidden"></div>
+        </div>
+      </div>
+
+      <!-- city badge (desktop) -->
+      {% if request.user.city %}
+        <div class="city-badge hidden md:flex flex-shrink-0">
+          <i class="fa fa-location-dot text-orange-400 text-xs"></i>
+          شهر شما: <strong>{{ request.user.city }}</strong>
+        </div>
+      {% endif %}
+    </div>
+
+  </div><!-- end header-fixed -->
+
+  <!-- ── MEGA MENU ── -->
+  <div id="menu-category">
+    <div class="mega-menu-inner">
+      <div class="mega-header">
+        <a href="{% url 'product_page' %}" class="mega-see-all">
+          <i class="fa fa-arrow-left text-[10px]"></i> مشاهده همه محصولات
+        </a>
+      </div>
+      <div class="mega-grid">
+        {% for category in categories %}
+          <div class="flex flex-col gap-1">
+            <a href="{% url 'product_page' %}?category={{ category.url_title }}" class="mega-cat-title">
+              {{ category.title }}
+            </a>
+            {% for brand in category.brand_set.all|slice:":4" %}
+              <a href="{% url 'product_page' %}?brand={{ brand.url_title }}&category={{ category.url_title }}" class="mega-brand-link">
+                {{ brand.title }}
+              </a>
+              {% for product in brand.products.all|slice:":3" %}
+                {% if category in product.category.all %}
+                  <a href="{% url 'product_detail_page' slug=product.url_title %}" class="mega-product-link">
+                    {{ product.short_title_fa }}
+                  </a>
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+<!-- ── MOBILE SEARCH OVERLAY ── -->
+<div id="search-mobile">
+    <div class="search-mobile-header">
+        <button class="search-mobile-back" onclick="closeSearchBox()">
+            <i class="fa fa-arrow-right"></i>
+        </button>
+        <form action="{% url 'product_page' %}" class="search-mobile-form"
+              onsubmit="handleSearchSubmit(event)">
+            <i class="fa fa-search text-gray-400 text-sm"></i>
+            <input type="text" name="q" id="search-box"
+                   placeholder="جستجو در نیوکالا"
+                   autocomplete="off"
+                   oninput="mobileLiveSearch(this.value)">
+        </form>
+    </div>
+
+    <!-- نتایج لایو سرچ -->
+    <div id="search-suggestions-mobile" class="hidden px-3 py-2 flex flex-col gap-1"></div>
+
+    <!-- تاریخچه -->
+    {% if request.user.is_authenticated %}
+    <div id="mobile-history-section" class="hidden">
+        <div class="search-section-title">
+            <i class="fa fa-clock-rotate-left text-gray-400"></i> تاریخچه جستجو
+        </div>
+        <div class="mySwiper mobile-tags-swiper px-3 pb-2">
+            <div class="swiper-wrapper" id="mobile-history-list"></div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ترندینگ -->
+      <!-- پرطرفدار (پیش‌فرض) -->
+      <div id="search-trending-section">
+        <div class="flex items-center gap-1 text-sm text-gray-400 font-semibold mb-2">
+          <i class="fa fa-fire text-red-400"></i> جستجوهای پرطرفدار
+        </div>
+        <div class="mySwiper overflow-hidden">
+          <div class="swiper-wrapper gap-2">
+              {% for top_search in top_searches %}
+                <a href="/product/?q={{ top_search.query }}" class="search-tag text-sm swiper-slide !w-max">{{ top_search.query }}</a>
+              {% endfor %}
+          </div>
+        </div>
+      </div>
+</div>
+</header>
+
+<!-- spacer -->
+<div class="header-spacer"></div>
+

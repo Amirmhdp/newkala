@@ -1,0 +1,194 @@
+{% load poll_extras %}
+
+<section class="md:w-[40%] lg:w-[28%] md:sticky" style=" top: 88px; align-self: flex-start;">
+  <!-- ─── MOBILE FILTER CHIPS ─── -->
+
+  <div class="section-card px-3 py-2 mb-3 md:hidden" style="overflow: visible !important;">
+    <!-- overflow:hidden روی section-card sticky رو میشکنه -->
+    <!-- باید overflow را از section-card بیرونی حذف کنی -->
+    <div class="mySwiper overflow-hidden">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide !w-auto">
+          <div class="flex gap-2 items-center">
+            <button class="clear-filter flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600 hover:border-gray-400 hover:text-gray-800 transition whitespace-nowrap filters-mobile">حذف فیلتر<i class="fa fa-chevron-down text-[9px]"></i></button>
+            <button onclick="openFilterPriceMobile()" class="flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600 hover:border-gray-400 hover:text-gray-800 transition whitespace-nowrap filters-mobile">محدوده قیمت <i class="fa fa-chevron-down text-[9px]"></i></button>
+            <button onclick="openFilterCategory()" class="flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600 hover:border-gray-400 hover:text-gray-800 transition whitespace-nowrap filters-mobile filter-product-category">دسته‌بندی <i class="fa fa-chevron-down text-[9px]"></i></button>
+            <button onclick="openFilterBrand()" class="flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600 hover:border-gray-400 hover:text-gray-800 transition whitespace-nowrap filters-mobile filter-product-item">برند <i class="fa fa-chevron-down text-[9px]"></i></button>
+            <button onclick="openFilterColor()" class="flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600 hover:border-gray-400 hover:text-gray-800 transition whitespace-nowrap filters-mobile filter-product-item">رنگ <i class="fa fa-chevron-down text-[9px]"></i></button>
+            <button onclick="openFilterSort()" class="flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600 hover:border-gray-400 hover:text-gray-800 transition whitespace-nowrap filters-mobile filter-product-item">مرتب سازی<i class="fa fa-sort text-[9px]"></i></button>
+          </div>
+        </div>
+      </div>
+      <div class="swiper-button-next !hidden"></div>
+      <div class="swiper-button-prev !hidden"></div>
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div id="filter-overlay" onclick="closeFilterOverlay()" class="fixed inset-0 z-30 bg-black/40"></div>
+
+  <!-- ─── MOBILE FILTER PANELS ─── -->
+
+  <div class="fixed z-40 md:hidden bottom-0 right-0 left-0 bg-white border-t border-gray-200 rounded-t-2xl shadow-2xl" id="filter-mobile">
+    <div class="fixed left-0 right-0 bg-white flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <h3 class="text-sm font-bold text-gray-800">فیلتر بر اساس قیمت</h3>
+      <button class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500" onclick="closeFilter()"><i class="fa fa-close text-sm"></i></button>
+    </div>
+    <div id="price-filter-container" class="p-4 mt-[35px]">
+      <div class="filter-by-product flex flex-col py-2" style="gap:17px!important">
+        <div class="flex items-center justify-center gap-3">
+          <span class="text-slate-600 text-base font-semibold">از</span>
+          <span class="text-slate-800 text-base font-bold min-price"></span>
+          <span class="text-slate-600 text-base">تومان</span>
+        </div>
+        <div class="flex items-center justify-center gap-3">
+          <span class="text-slate-600 text-base font-semibold">تا</span>
+          <span class="text-slate-800 text-base font-bold max-price"></span>
+          <span class="text-slate-600 text-base">تومان</span>
+        </div>
+        <div class="price-slider" data-min="{{ min_price_product }}" data-max="{{ max_price_product }}" data-start-min="{{ min_price_product }}" data-start-max="{{ max_price_product }}"></div>
+        <div class="flex items-center justify-between text-xs font-medium text-gray-400" style="margin:-9px 0">
+          <span>گران‌ترین</span><span>ارزان‌ترین</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fixed z-40 md:hidden bottom-0 right-0 left-0 bg-white h-[50%]  border-t border-gray-200 rounded-t-2xl shadow-2xl" id="filter-mobile-category">
+    <div class="!fixed left-0 right-0 bg-white flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <h3 class="text-sm font-bold text-gray-800">فیلتر بر اساس دسته‌بندی</h3>
+      <button class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500" onclick="closeFilter()"><i class="fa fa-close text-sm"></i></button>
+    </div>
+    <div class="flex flex-col gap-1 p-4 h-full overflow-y-auto">
+      {% for category in categories %}
+        <a href="#"  data-type="category" data-value="{{ category.url_title }}" class="filter-link filter-product flex {% if forloop.first %} mt-[35px] {% endif %} items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer"><span class="text-sm text-gray-700 font-medium">{{ category.title }}</span></a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="fixed z-40 md:hidden bottom-0 right-0 left-0 h-[50%]  bg-white border-t border-gray-200 rounded-t-2xl shadow-2xl" id="filter-mobile-sort">
+    <div class="fixed left-0 right-0 bg-white flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <h3 class="text-sm font-bold text-gray-800">مرتب سازی بر اساس</h3>
+      <button class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500" onclick="closeFilter()"><i class="fa fa-close text-sm"></i></button>
+    </div>
+    <div class="flex flex-col gap-1 p-4 h-full overflow-y-auto">
+        <a href="" class="mt-[35px] filter-product filter-link flex items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" data-type="brand" data-cheapest-value="cheapest-product"><span class="text-sm text-gray-700 font-medium">ارزان ترین</span></a>
+        <a href="" class="filter-link filter-product flex items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" data-type="brand" data-expensive-value="expensive-product"><span class="text-sm text-gray-700 font-medium">گران ترین</span></a>
+        <a href="" class="filter-link filter-product flex items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" data-type="brand" data-newest-value="newest-product"><span class="text-sm text-gray-700 font-medium">جدیدترین</span></a>
+        <a href="" class="filter-link filter-product flex items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" data-type="brand" data-rating-value="rating-product"><span class="text-sm text-gray-700 font-medium">امتیاز</span></a>
+        <a href="" class="filter-link filter-product flex items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" data-type="brand" data-available-value="available-product"><span class="text-sm text-gray-700 font-medium">موجود در انبار</span></a>
+
+    </div>
+  </div>
+
+  <div class="fixed z-40 md:hidden bottom-0 right-0 left-0 h-[50%]  bg-white border-t border-gray-200 rounded-t-2xl shadow-2xl" id="filter-mobile-brand">
+    <div class="fixed left-0 right-0 bg-white flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <h3 class="text-sm font-bold text-gray-800">فیلتر بر اساس برند</h3>
+      <button class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500" onclick="closeFilter()"><i class="fa fa-close text-sm"></i></button>
+    </div>
+    <div class="flex flex-col gap-1 p-4 h-full overflow-y-auto">
+      {% for brand in brands %}
+        <a href="" data-brand-value="{{ brand.url_title }}" class="{% if forloop.first %} mt-[35px] {% endif %} filter-product filter-link flex items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" data-type="brand" ><span class="text-sm text-gray-700 font-medium">{{ brand.title }}</span></a>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="fixed z-40 h-[50%] md:hidden bottom-0 right-0 left-0 bg-white border-t border-gray-200 rounded-t-2xl shadow-2xl" id="filter-mobile-color">
+    <div class="fixed left-0 right-0 bg-white flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <h3 class="text-sm font-bold text-gray-800">فیلتر بر اساس رنگ</h3>
+      <button class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500" onclick="closeFilter()"><i class="fa fa-close text-sm"></i></button>
+    </div>
+    <div class="flex flex-col gap-1 p-4 h-full overflow-y-auto">
+      {% for color in colors %}
+        <a href="" data-color-value="{{ color.url_title }}" class="{% if forloop.first %} mt-[35px] {% endif %} filter-product filter-link flex items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" data-type="color"><span class="text-sm text-gray-700 font-medium">{{ color }}</span></a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- ─── DESKTOP FILTER SIDEBAR ─── -->
+
+  <div class="hidden md:block mr-2 rounded-2xl border border-gray-100" style="background:#fff; box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.05);">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <span class="text-sm font-bold text-gray-800">فیلترها</span>
+      <a class="clear-filter cursor-pointer text-xs font-semibold text-red-500 hover:text-red-700 transition flex items-center gap-1"><i class="fa fa-times text-[10px]"></i> حذف فیلتر</a>
+    </div>
+
+    <!-- price -->
+    <div class="border-b border-gray-100">
+      <div class="flex items-center open-close-filter cursor-pointer justify-between px-4 py-3 hover:bg-gray-50 transition">
+        <h3 class="text-sm font-semibold text-gray-700">محدوده قیمت</h3>
+        <i class="fa fa-chevron-down text-xs text-gray-400"></i>
+      </div>
+      <div class="hidden filter-by-product flex-col px-4 pb-4" style="gap:17px!important">
+        <div class="flex items-center justify-center gap-3 pt-2">
+          <span class="text-slate-500 text-base font-medium">از</span>
+          <span class="text-slate-800 text-base font-bold min-price"></span>
+          <span class="text-slate-500 text-base">تومان</span>
+        </div>
+        <div class="flex items-center justify-center gap-3">
+          <span class="text-slate-500 text-base font-medium">تا</span>
+          <span class="text-slate-800 text-base font-bold max-price"></span>
+          <span class="text-slate-500 text-base">تومان</span>
+        </div>
+        <div class="price-slider" data-min="{{ min_price_product }}" data-max="{{ max_price_product }}" data-start-min="{{ min_price_product }}" data-start-max="{{ max_price_product }}"></div>
+        <div class="flex items-center justify-between" style="margin:-9px 0">
+          <span class="text-sm text-gray-400">گران‌ترین</span>
+          <span class="text-sm text-gray-400">ارزان‌ترین</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- category -->
+    <div class="border-b border-gray-100">
+      <div class="flex items-center open-close-filter cursor-pointer justify-between px-4 py-3 hover:bg-gray-50 transition">
+        <h3 class="text-sm font-semibold text-gray-700">دسته‌بندی</h3>
+        <i class="fa fa-chevron-down text-xs text-gray-400"></i>
+      </div>
+      <div class="hidden filter-by-product flex-col px-3 pb-3">
+        {% for category in categories %}
+          <a href="#" data-current-category="{{ request.GET.category }}" data-type="category" data-value="{{ category.url_title }}" class="filter-link flex items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer filter-product"><span class="text-sm text-gray-600">{{ category.title }}</span></a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- sort -->
+    <div class="border-b border-gray-100">
+      <div class="flex items-center open-close-filter cursor-pointer justify-between px-4 py-3 hover:bg-gray-50 transition">
+        <h3 class="text-sm font-semibold text-gray-700">مرتب‌سازی</h3>
+        <i class="fa fa-chevron-down text-xs text-gray-400"></i>
+      </div>
+      <div class="hidden filter-by-product flex-col px-3 pb-3">
+        <a href="#" data-expensive-value="expensive-product" class="filter-link flex items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer filter-product"><span class="text-sm text-gray-600">گران‌ترین</span></a>
+        <a href="#" data-cheapest-value="cheapest-product" class="filter-link flex items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer filter-product"><span class="text-sm text-gray-600">ارزان‌ترین</span></a>
+        <a href="#" data-newest-value="newest-product" class="filter-link flex items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer filter-product"><span class="text-sm text-gray-600">جدیدترین</span></a>
+        <a href="#" data-rating-value="rating-product" class="filter-link flex items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer filter-product"><span class="text-sm text-gray-600">امتیاز</span></a>
+        <a href="#" data-available-value="available-product" class="filter-link flex items-center justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer filter-product"><span class="text-sm text-gray-600">موجود در انبار</span></a>
+      </div>
+    </div>
+
+    <!-- brand -->
+    <div class="border-b border-gray-100">
+      <div class="flex items-center open-close-filter cursor-pointer justify-between px-4 py-3 hover:bg-gray-50 transition">
+        <h3 class="text-sm font-semibold text-gray-700">برند</h3>
+        <i class="fa fa-chevron-down text-xs text-gray-400"></i>
+      </div>
+      <div class="hidden filter-by-product flex-col px-3 pb-3">
+        {% for brand in brands %}
+          <a href="#" class="filter-link flex items-center filter-product justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" data-type="brand" data-brand-value="{{ brand.url_title }}"><span class="text-sm text-gray-600">{{ brand.title }}</span></a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- color -->
+    <div>
+      <div class="flex items-center open-close-filter cursor-pointer justify-between px-4 py-3 hover:bg-gray-50 transition">
+        <h3 class="text-sm font-semibold text-gray-700">رنگ</h3>
+        <i class="fa fa-chevron-down text-xs text-gray-400"></i>
+      </div>
+      <div class="hidden filter-by-product flex-col px-3 pb-3">
+        {% for color in colors %}
+          <a href="#" class="filter-link flex items-center filter-product justify-between py-2 px-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" data-type="color" data-color-value="{{ color.url_title }}"><span class="text-sm text-gray-600">{{ color }}</span></a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

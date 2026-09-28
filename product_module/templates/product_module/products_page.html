@@ -1,0 +1,50 @@
+{% extends 'shared/layout.html' %}
+{% load render_partial %}
+
+{% block title %}صفحه محصولات{% endblock %}
+
+{% block content %}
+
+<main class="" style="background:#f2f4f8;">
+  <div class="max-w-screen-xl mx-auto px-3 md:px-4 ">
+
+    <!-- page title -->
+    <div class="mb-4 px-1">
+      <h2 class="text-base font-bold text-slate-700 section-title animate-fade-up">محصولات</h2>
+    </div>
+
+    <div class="md:flex md:items-start md:gap-4 w-full">
+
+      <!-- FILTER SIDEBAR -->
+      {% render_partial 'product_module.views.filter_product' %}
+
+      <!-- PRODUCT LIST -->
+      <div  class="flex flex-1 min-w-0">
+        <div class="section-card w-full p-2 md:p-3" id="list-of-product">
+          {% include 'product_module/component/product_list.html' with products=products rating=rating error_image=error_image %}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PAGINATION -->
+    {% if products %}
+      <div class="flex items-center justify-center mt-6 gap-1.5">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="page-btn-label">قبلی</a>
+        {% endif %}
+        {% for page in paginator.page_range %}
+          <a href="?page={{ page }}" class="page-btn {% if page_obj.number == page %}active{% endif %}">{{ page }}</a>
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="page-btn-label">بعدی</a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  </div>
+
+  {% include 'shared/navbar_mobile.html' %}
+</main>
+
+{% endblock %}

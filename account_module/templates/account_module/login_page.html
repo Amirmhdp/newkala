@@ -1,0 +1,42 @@
+
+{% load static %}
+
+<!doctype html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% include 'shared/header_references.html' %}
+    <title>Document</title>
+</head>
+<body>
+    <main class="w-full h-svh flex items-center justify-center px-3">
+    <section class="flex flex-col w-[360px] md:w-[380px] justify-center px-3  md:px-7 py-4 gap-4  border border-gray-300 rounded-lg ">
+        <form action="{% url 'login_page' %}" method="post" class="flex flex-col justify-center gap-4">
+            {% csrf_token %}
+            <div class="flex items-center justify-center">
+            <img src="/static/img/InShot_20260615_193439595.png" class="w-[45%]" alt="logo-website">
+        </div>
+            <div class="flex flex-col form-register justify-center items-start gap-2">
+                {{ login_form.email.label_tag }}
+                {{ login_form.email }}
+                {{ login_form.email.errors }}
+            </div>
+            <div class="flex flex-col form-register justify-center items-start gap-2">
+                {{ login_form.password.label_tag }}
+                {{ login_form.password }}
+                {{ login_form.password.errors }}
+            </div>
+            <div class="flex flex-row items-center justify-between">
+                <a href="{% url 'register_page' %}" class="text-sky-600 text-sm ">ثبت نام نکرده ام</a>
+                <a href="{% url 'forgot_password_page' %}" class="text-sky-600 text-sm ">فراموشی رمز عبور</a>
+            </div>
+            <button type="submit" class="w-full bg-red-600 md:bg-red-500 md:hover:bg-red-600 text-white rounded-md px-3 py-2 transition-all duration-200">ورود</button>
+        </form>
+    </section>
+</main>
+    {% include 'shared/footer_references.html' %}
+</body>
+</html>

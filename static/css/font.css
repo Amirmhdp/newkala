@@ -1,0 +1,8 @@
+
+@font-face {
+    font-family: 'IRANSansXFaNum';
+    src: url(/static/font/IRANSansXFaNum-RegularD4.ttf);
+}
+body{
+    font-family: 'IRANSansXFaNum' !important;
+}

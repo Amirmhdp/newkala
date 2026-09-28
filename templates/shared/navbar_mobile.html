@@ -1,0 +1,20 @@
+{% load static %}
+
+<section class="mobile-nav fixed z-20 md:hidden bottom-0 right-0 left-0 flex justify-evenly items-center" style="padding:4px 8px 6px">
+  <a href="{% url 'home_page' %}" class="nav-item item-nav-mobile   !w-max">
+    <img src="/static/img/home-smile-angle-svgrepo-com%20(2).svg" alt="home">
+    خانه
+  </a>
+  <a href="{% url 'category_page' %}" class="nav-item item-nav-mobile !w-max">
+    <img src="{% static 'img/category-svgrepo-com.svg' %}" alt="category">
+    دسته‌بندی
+  </a>
+  <a href="{% url 'order_page' %}" class="nav-item item-nav-mobile !w-max">
+    <img src="{% static 'img/shopping-card-svgrepo-com.svg' %}" alt="cart">
+    سبد خرید
+  </a>
+  <a href="{% url "user_panel_page" %}" class="nav-item item-nav-mobile  !w-max">
+    <img src="{% static 'img/profile-circle-svgrepo-com.svg' %}" alt="profile">
+    پروفایل
+  </a>
+</section>

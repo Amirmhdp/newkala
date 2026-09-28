@@ -1,0 +1,21 @@
+{% load poll_extras %}
+{% for product_amazing in products_amazing %}
+
+    <div class="md:h-[288px] md:w-[184px] w-[140px] h-[220px] shrink-0  bg-white px-3 py-3  {% if forloop.first %}rounded-r-lg{% endif %}">
+        <a href="{{ product_amazing.get_absolute_url }}" class="flex flex-col items-center justify-center gap-1 md:gap-3 md:px-2">
+            <img src="{{ product_amazing.image.url }}" class="w-28 md:w-[152px] md:h-[144px]" alt="">
+            <p class=' text-xs text-gray-500 line-clamp-2 text-justify '>{{ product_amazing.title_fa }}</p>
+            <div class="flex flex-col justify-center gap-2 w-full">
+                <div class="flex items-center justify-between gap-1">
+
+                    <span class="px-1 rounded-lg bg-red-600 text-white text-sm font-bold">{{ product_amazing.discount.discount_value }}%</span>
+
+                    <span class="text-xs font-bold line-through text-gray-500 whitespace-nowrap">{{ product_amazing.price|three_digits_currency }}تومانءء</span>
+                </div>
+
+                        <span class="text-sm text-end font-bold text-gray-800 whitespace-nowrap">{{ product_amazing.final_price|three_digits_currency }} تومانءء</span>
+
+            </div>
+        </a>
+    </div>
+{% endfor %}

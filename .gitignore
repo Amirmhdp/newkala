@@ -1,0 +1,27 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+venv/
+env/
+.venv/
+
+# ===== Django =====
+db.sqlite3
+media/
+files/
+staticfiles/
+*.log
+
+# ===== Secrets =====
+.env
+.env.*
+!.env.example
+
+# ===== Node / Tailwind =====
+node_modules/
+
+# ===== IDE / OS =====
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

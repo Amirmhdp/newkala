@@ -1,0 +1,18 @@
+{% load poll_extras %}
+{% for bought_product in all_bought_product %}
+       <div class="order-item">
+          <img class="order-thumb" src="{{ bought_product.product.image.url }}">
+          <div class="order-info">
+            <div class="order-title">{{ bought_product.product.title_fa }}</div>
+            <div class="order-meta">
+              <span class="order-date">{{ bought_product.order.payment_date|jalali_date }}</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <span class="status-pill  {% if bought_product.status == 'paid' %} status-paid {% else %} status-delivered {% endif %}">{{ bought_product.get_status_display }}</span>
+            <span class="order-price">{{ bought_product.final_price }} تومانءء</span>
+          </div>
+       </div>
+{% endfor %}
+
+

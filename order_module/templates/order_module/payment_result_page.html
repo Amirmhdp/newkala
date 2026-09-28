@@ -1,0 +1,72 @@
+{% extends 'shared/layout.html' %}
+{% load poll_extras %}
+{% block title %}نتیجه پرداخت{% endblock %}
+
+{% block content %}
+
+<main class="result-page-wrap">
+  <div class="result-card">
+
+    {% if status == 'success' %}
+      <div class="result-icon success"><i class="fa fa-check"></i></div>
+    {% elif status == 'canceled' %}
+      <div class="result-icon canceled"><i class="fa fa-ban"></i></div>
+    {% else %}
+      <div class="result-icon error"><i class="fa fa-times"></i></div>
+    {% endif %}
+
+    <h1 class="result-title">{{ title }}</h1>
+
+    {% if message %}
+      <p class="result-message">{{ message }}</p>
+    {% endif %}
+
+    {% if status == 'success' %}
+      <div class="result-details">
+        {% if ref_id %}
+          <div class="detail-row">
+            <span class="detail-label">کد پیگیری</span>
+            <span class="detail-value">{{ ref_id }}</span>
+          </div>
+        {% endif %}
+        {% if amount %}
+          <div class="detail-row">
+            <span class="detail-label">مبلغ پرداخت‌شده</span>
+            <span class="detail-value">{{ amount|three_digits_currency }} ریال </span>
+          </div>
+        {% endif %}
+        {% if order %}
+          <div class="detail-row">
+            <span class="detail-label">شماره سفارش</span>
+            <span class="detail-value">#{{ order.id }}</span>
+          </div>
+        {% endif %}
+        {% if phone_number %}
+          <div class="detail-row">
+            <span class="detail-label">شماره تلفن</span>
+            <span class="detail-value">{{ phone_number.number }}</span>
+          </div>
+        {% endif %}
+        {% if address %}
+          <div class="detail-row">
+            <span class="detail-label">آدرس</span>
+            <span class="detail-value">{{ address.full_address }}</span>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="result-actions">
+      {% if status == 'success' %}
+        <a href="{% url 'user_panel_page' %}" class="btn-result-primary">مشاهده سفارش‌های من</a>
+        <a href="{% url 'home_page' %}" class="btn-result-secondary">بازگشت به صفحه اصلی</a>
+      {% else %}
+        <a href="{% url 'order_page' %}" class="btn-result-primary">بازگشت به سبد خرید</a>
+        <a href="{% url 'home_page' %}" class="btn-result-secondary">بازگشت به صفحه اصلی</a>
+      {% endif %}
+    </div>
+
+  </div>
+</main>
+
+{% endblock %}

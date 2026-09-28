@@ -1,0 +1,71 @@
+{% extends 'shared/layout.html' %}
+{% load poll_extras %}
+
+{% block title %}دسته‌بندی محصولات{% endblock %}
+
+{% block content %}
+
+<main class="md:pb-6" style="background:#f2f4f8;">
+
+
+  <div class="max-w-screen-xl mx-auto px-3 md:px-4 ">
+
+    <!-- search -->
+    <div class="cat-search mb-1 max-w-md mx-auto">
+      <i class="fa fa-search text-gray-400 text-sm"></i>
+      <input type="text" id="category-search-input" placeholder="جستجو در دسته‌بندی‌ها...">
+    </div>
+    <div class="flex items-center justify-start py-2 px-1 mb-1">
+        <h2 class="section-title">دسته‌بندی‌ها</h2>
+    </div>
+
+    {% if categories %}
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4" id="category-grid">
+        {% for category in categories %}
+          <a href="{% url 'product_page' %}?category={{ category.url_title }}"
+             class="cat-card category-item" data-name="{{ category.title }}">
+
+            <div class="cat-image-wrap">
+              {% if category.image %}
+                <img src="{{ category.image.url }}" alt="{{ category.title }}">
+              {% else %}
+                <div class="cat-image-fallback">
+                  <i class="fa fa-shapes"></i>
+                </div>
+              {% endif %}
+
+              {% if category.product_set.count %}
+                <span class="cat-badge">{{ category.product_set.count }} محصول</span>
+              {% endif %}
+            </div>
+
+            <div class="cat-info">
+              <span class="cat-name whitespace-nowrap">{{ category.title }}</span>
+              <div class="cat-arrow"><i class="fa fa-arrow-left"></i></div>
+            </div>
+
+          </a>
+        {% endfor %}
+      </div>
+
+      <!-- empty search result -->
+      <div id="no-category-result" class="section-card hidden flex-col items-center justify-center gap-3 py-16 px-6 text-center mt-4">
+        <div class="text-4xl">🔍</div>
+        <span class="text-gray-500 font-semibold text-sm">دسته‌بندی‌ای با این عنوان پیدا نشد</span>
+      </div>
+
+    {% else %}
+      <div class="section-card flex flex-col items-center justify-center gap-3 py-16 px-6 text-center">
+        <div class="text-4xl">📭</div>
+        <span class="text-gray-500 font-semibold text-sm">در حال حاضر دسته‌بندی‌ای ثبت نشده است</span>
+      </div>
+    {% endif %}
+
+  </div>
+
+  {% include 'shared/navbar_mobile.html' %}
+</main>
+
+
+
+{% endblock %}

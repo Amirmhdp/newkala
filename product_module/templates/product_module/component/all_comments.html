@@ -1,0 +1,37 @@
+ {% load static %}
+{% load poll_extras %}
+      <div class="overlay-header">
+        <span class="text-base text-slate-700 font-bold">نظرات کاربران: {{ comments_count }}</span>
+        <button class="close-btn" onclick="closeCommentBox()"><i class="fa fa-close"></i></button>
+      </div>
+      <div class="flex flex-col gap-3 px-4 py-4 max-w-2xl mx-auto overflow-y-auto" style="height:calc(100vh - 60px)">
+        {% for comment in comments %}
+          {% if comments and comment.text %}
+            <div class="comment-card-item">
+              <div class="flex items-center gap-3 mb-2">
+                {% if comment.user.avatar %}<img src="{{ comment.user.avatar.url }}" class="w-9 h-9 rounded-full" alt="">{% endif %}
+                <div>
+                  <span class="text-slate-700 font-bold text-sm block">{{ comment.user.get_full_name }}</span>
+                  <span class="text-gray-400 text-xs">{{ comment.created_date|jalali_date }}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-0.5 mb-2">
+                {% for i in "12345" %}{% if forloop.counter <= comment.rating %}
+                  <img src="{% static "img/star-svgrepo-com.svg" %}" class="w-5 h-5" alt="star-icon">
+                  {% endif %}{% endfor %}
+              </div>
+              <p class="text-slate-600 text-sm leading-relaxed">{{ comment.text }}</p>
+              {% for response in comment.comment_set.all %}
+                <div class="mt-3 mr-4 border-r-2 border-gray-100 pr-3 py-2">
+                  <div class="flex items-center gap-2 mb-1">
+                    {% if response.user.avatar %}<img src="{{ response.user.avatar.url }}" class="w-7 h-7 rounded-full" alt="">{% endif %}
+                    <span class="text-slate-600 font-bold text-xs">{{ response.user }}</span>
+                    <span class="text-gray-400 text-xs">12 مهر 1404</span>
+                  </div>
+                  <p class="text-slate-500 text-xs leading-relaxed">{{ response.text }}</p>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>

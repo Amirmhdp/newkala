@@ -1,0 +1,30 @@
+{% load poll_extras %}
+{% load static %}
+
+{% if favorite_products %}
+    <div class="wishlist-grid" >
+    {% for favorite_product in favorite_products %}
+      <div class="wish-item">
+        <div class="wish-remove " onclick="deleteWish({{ favorite_product.id }})">
+          <i class="fas fa-times"></i>
+        </div>
+        <img class="wish-img" src="{{ favorite_product.product.image.url }}">
+        <div class="wish-name line-clamp-2">{{ favorite_product.product.title_fa }}</div>
+          {% if favorite_product.product.final_price != 'None' %}
+            <span class="text-slate-800 text-sm font-extrabold text-end">{{ favorite_product.product.final_price|three_digits_currency }} تومان</span>
+            {% else %}
+              <span class="text-slate-800 text-sm font-extrabold text-end">{{ favorite_product.product.price|three_digits_currency }} تومان</span>
+          {% endif %}
+      </div>
+    {% endfor %}
+    </div>
+    {% else %}
+    <div class="flex flex-col justify-center items-center w-full py-3">
+        <img src="{% static 'img/favorites-list-empty.svg' %}" alt="favorite-icon">
+        <span class="card-title">لیست علاقه مندی شما خالی است</span>
+    </div>
+{% endif %}
+
+
+
+

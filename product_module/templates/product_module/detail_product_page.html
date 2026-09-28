@@ -1,0 +1,527 @@
+{% extends 'shared/layout.html' %}
+{% load static %}
+{% load poll_extras %}
+{% block title %}{{ product.title_fa }}{% endblock %}
+{% block header_references %}
+  <link rel="stylesheet" href="{% static "lib/img-lightbox/css/lightbox.min.css" %}"></link>
+{% endblock%}
+{% block footer_references %}
+  <script src="{% static "lib/img-lightbox/lightbox.min.js" %}"></script>
+  <script src="{% static "lib/img-lightbox/js/lightbox-plus-jquery.min.js" %}"></script>
+{% endblock%}
+{% block content %}
+<main class="" style="background:#f2f4f8;min-height:100vh;" id="detail-product">
+
+  <div class="w-full relative flex flex-col justify-between">
+    <div class="w-full relative flex flex-col justify-between md:items-start md:flex-row md:px-3">
+
+      <!-- IMAGE COLUMN -->
+      <section class="slider animate-fade-up  filter md:w-[40%] md:h-max lg:w-[30%] lg:h-[408px] m-3 md:mt-0">
+        <div class=" img-product-slider md:!hidden !relative bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+          <div class="swiper-wrapper md:!hidden">
+            {% for img in gallery_product %}
+              <div class="swiper-slide !flex !items-center !justify-center" style="height:270px">
+                <img src="{{ img.image.url }}" class="h-[220px] w-[220px] object-contain p-4" alt="">
+              </div>
+            {% endfor %}
+          </div>
+          <div class="swiper-pagination img-product-pagination  bg-black/30 backdrop-blur-md rounded-xl border border-white/20 px-3 ml-2 !w-max !bottom-3"></div>
+        </div>
+
+        <div class="swiper !hidden detail-img-md !relative bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide !flex !items-center !justify-center !relative" style="height:300px">
+              <img src="{{ product.image.url }}" id="main-image-product"
+                class="h-[250px] w-[250px] md:w-[300px] md:h-[300px] object-contain p-5" alt="{{ product.title_fa }}">
+              <a href="{{ product.image.url }}" id="large-img-src" class="!absolute bottom-1 left-2 bg-red-600 text-base px-9 py-1 rounded-lg font-bold text-white z-20" data-lightbox="image-product">بزرگنمایی</a>
+              </div>
+          </div>
+          <div class="swiper-pagination bg-black/30 backdrop-blur-md rounded-xl border border-white/20 px-3 ml-2 !w-max !bottom-3"></div>
+        </div>
+
+        <section class="px-3 mt-2" id="same-product">
+          <div class="flex items-start justify-between px-2 mt-2">
+
+          </div>
+          <div class="product-gallery overflow-hidden mt-2">
+            <div class="swiper-wrapper !flex !items-center ">
+                  {% for image_product in gallery_product %}
+              <div class="swiper-slide !w-auto overflow-hidden">
+                <div class="hidden md:flex gap-2 items-center">
+                    <a class="cursor-pointer" onclick="openLargeIme('{{ image_product.image.url }}')">
+                      <img src="{{ image_product.image.url }}" class="w-[68px] h-[68px] border-2 border-gray-200 hover:border-gray-400 p-1.5 rounded-xl object-contain" alt="">
+                    </a>
+                </div>
+              </div>
+                  {% endfor %}
+            </div>
+            <div class="swiper-button-next !hidden detail-img-md !absolute !p-2 !font-bold !w-8 !h-8 rounded-full bg-white border border-gray-300 shadow-sm !top-[49%] !right-[41%] lg:!top-[84%] lg:!right-[31%] !text-slate-700"></div>
+            <div class="swiper-button-prev !hidden detail-img-md !absolute !p-2 !font-bold !w-8 !h-8 rounded-full bg-white border border-gray-300 shadow-sm !top-[49%] !right-[0%] lg:!top-[84%]  !text-slate-700"></div>
+          </div>
+        </section>
+      </section>
+
+      <!-- INFO COLUMN -->
+      <section class="md:w-[55%] lg:w-[30%] lg:h-[408px] px-3 flex flex-col md:gap-3">
+        <!-- title + rating -->
+        <div class="section-card animate-fade-up flex flex-col gap-4 p-4 mb-3">
+          <div class="flex flex-col gap-1">
+            <h1 class="line-clamp-2 text-slate-800 text-base md:text-lg font-extrabold leading-relaxed">{{ product.title_fa }}</h1>
+            {% if product.title_en %}
+              <span class="text-gray-400 text-xs font-light tracking-wide">{{ product.title_en }}</span>
+            {% endif %}
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <div class="" id="avg-star">
+                {% include 'product_module/component/rating.html' with rating=rating %}
+            </div>
+
+            <div class="" id="number-of-comments">
+                {% include 'product_module/component/count_comments.html' with comments_count=comments_count %}
+            </div>
+            {% if product_by_categories %}
+              <span class="px-3 text-xs cursor-pointer text-blue-600 bg-blue-50 h-6 flex items-center rounded-full font-medium" id="same">مرتبط‌ها</span>
+            {% endif %}
+            <div id="wishes">
+                {% include 'product_module/component/like.html' with prduct=product favorite=favorite %}
+            </div>
+          </div>
+        </div>
+
+        <!-- colors -->
+        <div class="section-card animate-fade-up flex flex-col gap-3 py-4 px-4 mb-3">
+          <h2 class="text-base section-title text-slate-700 font-bold">رنگ بندی :</h2>
+          <div class="grid grid-cols-3 gap-2">
+            {% for color in colors %}
+              <button class="border-2 border-gray-200 rounded-xl flex items-center gap-1.5 py-0.5 px-2 focus:border-gray-400 w-max">
+                <span class="w-5 h-5 rounded-full border border-gray-200 flex-shrink-0" style="background: {{ color.colr_code }}"></span>
+                <span class="px-1 text-xs font-medium text-gray-700">{{ color.color }}</span>
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- quick specs -->
+        <section class="rounded-2xl animate-fade-up bg-white p-4" style="box-shadow: var(--shadow);">
+          <div class="flex items-center justify-between px-2 mt-3 mb-3">
+            <h2 class="section-title text-base font-bold text-slate-700">مشخصات کالا</h2>
+
+            <span class="flex items-center gap-1 font-bold cursor-pointer text-red-600 text-xs" id="show-info-product" onclick="showInformation()">
+              مشاهده همه <i class="fa fa-arrow-left"></i>
+            </span>
+          </div>
+          <div class="mySwiper overflow-hidden">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide !w-auto overflow-hidden">
+                <div class="flex gap-2 items-center">
+                    {% regroup specifications by attribute.group.title as groups %}
+                      {% for group in groups %}
+                        {% for item in group.list|slice:':4' %}
+                          <div class="attr-chip-inner">
+                            <span class="text-gray-400 text-sm font-medium">{{ item.attribute.title }}</span>
+                            <span class="text-slate-800 text-sm font-bold">
+                              {% for v in item.values.all|slice:':1' %}
+                                {{ v.value }}
+                              {% endfor %}
+                            </span>
+                          </div>
+                        {% endfor %}
+                      {% endfor %}
+                </div>
+              </div>
+            </div>
+            <div class="swiper-button-next !hidden"></div>
+            <div class="swiper-button-prev !hidden"></div>
+          </div>
+        </section>
+
+      <!-- SELLER COLUMN (lg+) -->
+      <section class="flex lg:hidden mt-4 w-[33%] h-[430px] animate-fade-up flex-col justify-center pb-4">
+        <div class="section-card flex flex-col gap-5 px-5 py-5 h-full justify-between">
+          <div class="flex flex-col gap-5">
+            <div class="flex justify-between items-center">
+              <span class="text-base text-slate-700 font-bold">اطلاعات فروشنده</span>
+              {% if product_by_categories %}
+                <span class="text-sm text-slate-500 font-medium cursor-pointer hover:text-slate-700" id="else-product-md">
+                  سایر محصولات <i class="fa fa-chevron-left text-[9px]"></i>
+                </span>
+              {% endif %}
+            </div>
+            <a class="seller-row flex items-center gap-3">
+              <img src="/static/img/profile-img-default.png" class="w-10 h-10 rounded-full border border-gray-200" alt="">
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm text-slate-700 font-bold">{{ settings_site.site_name }}</span>
+                  <span class="text-xs bg-blue-100 px-2 py-0.5 rounded-full text-blue-600 font-bold">منتخب</span>
+                </div>
+                <span class="flex items-center gap-1 text-slate-600 border border-gray-200 rounded-full pr-2 py-0.5 text-xs w-max">
+                  عملکرد <span class="bg-green-100 px-2 py-0.5 rounded-full text-green-600 font-bold">عالی</span>
+                </span>
+              </div>
+            </a>
+            <div class="flex flex-col gap-4">
+              <div class="flex gap-3 items-start">
+                <div class="icon-circle"><i class="fa fa-wallet text-sm"></i></div>
+                <div class="flex flex-col gap-1">
+                  <span class="text-slate-700 font-bold text-sm">روش‌ها و هزینه‌های ارسال</span>
+                  <span class="text-slate-500 text-xs flex items-center gap-1.5"><i class="fa fa-shipping-fast"></i>توسط نیوکالا</span>
+                  <span class="text-slate-500 text-xs flex items-center gap-1.5"><i class="fa fa-tachometer-alt"></i>ارسال در نیوکالا</span>
+                </div>
+              </div>
+              <div class="flex gap-3 items-start">
+                <div class="icon-circle"><i class="fa fa-star text-sm"></i></div>
+                <div class="flex flex-col gap-1">
+                  <span class="text-slate-700 font-bold text-sm">ویژه اعضای ویژه سایت</span>
+                  <span class="text-slate-500 text-xs">ارسال سریع و رایگان نیوکالا (قم)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hidden md:flex flex-row justify-between border-t border-gray-100 pt-4">
+            <button class="bg-red-600 px-5 py-2.5 text-white rounded-xl text-sm"
+              id="btn-add-product-to-order" onclick="addToOrder({{ product.id }})">
+              افزودن به سبد خرید
+            </button>
+            <div class="flex flex-col justify-center items-end gap-1">
+              <div class="flex items-center gap-1">
+                {% if product.discount.is_active %}
+                  <span class="bg-red-600 text-white px-2 py-0.5 rounded-md text-xs font-bold">{{ product.discount.discount_value }}%</span>
+                  <span class="text-xs text-gray-400 line-through font-medium">{{ product.price|three_digits_currency }} تومان</span>
+                {% endif %}
+              </div>
+              <span class="text-sm font-bold text-slate-800 whitespace-nowrap">
+                {% if product.discount.is_active %}{{ product.final_price|three_digits_currency }}{% else %}{{ product.price|three_digits_currency }}{% endif %} تومان
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+        <!-- product info overlay (mobile) -->
+        <section class="hidden flex-col gap-3 animate-fade-up px-2 py-3 fixed overflow-y-auto scroll-smooth top-0 right-0 left-0 w-full bg-white bottom-0 " style="z-index: 100;" id="product-info">
+          <div class="overlay-header">
+            <h2 class="section-title text-slate-700 font-bold text-base md:text-lg">مشخصات و بررسی کالا</h2>
+            <button class="close-btn" onclick="closeInformation()"><i class="fa fa-close"></i></button>
+          </div>
+          <div class="px-4 pt-3">
+        {% regroup specifications by attribute.group.title as groups %}
+            {% for group in groups %}
+              <div class="flex flex-col md:flex-row md:gap-10 gap-3 mb-6">
+                <span class="text-slate-700 text-sm font-bold md:text-base  whitespace-nowrap md:w-[18%]">{{ group.grouper }}</span>
+                <table class="flex flex-col gap-1 md:w-full">
+                  <tbody>
+                    {% for item in group.list %}
+                      <tr class="spec-tr flex items-stretch gap-5 text-right">
+                        <th class="spec-th text-slate-400 w-32 text-xs md:text-sm px-3 py-2"> {{ item.attribute.title }}</th>
+                        <td class="flex flex-col gap-1 flex-1 pr-2 text-xs md:text-sm py-2 px-1 text-slate-700 font-medium">
+                            {% for v in item.values.all %}
+                                <span>{{ v.value }}</span>{% if not forloop.last %} {% endif %}
+                            {% endfor %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% endfor %}
+          </div>
+        </section>
+
+      </section>
+
+      <!-- SELLER COLUMN (lg+) -->
+      <section class="hidden lg:flex lg:w-[33%] lg:h-[430px] animate-fade-up flex-col justify-center pb-4">
+        <div class="section-card flex flex-col gap-5 px-5 py-5 h-full justify-between">
+          <div class="flex flex-col gap-5">
+            <div class="flex justify-between items-center">
+              <span class="text-base text-slate-700 font-bold">اطلاعات فروشنده</span>
+              {% if product_by_categories %}
+                <span class="text-sm text-slate-500 font-medium cursor-pointer hover:text-slate-700" id="else-product-lg">
+                  سایر محصولات <i class="fa fa-chevron-left text-[9px]"></i>
+                </span>
+              {% endif %}
+            </div>
+            <a class="seller-row flex items-center gap-3">
+              <img src="/static/img/profile-img-default.png" class="w-10 h-10 rounded-full border border-gray-200" alt="">
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm text-slate-700 font-bold">{{ settings_site.site_name }}</span>
+                  <span class="text-xs bg-blue-100 px-2 py-0.5 rounded-full text-blue-600 font-bold">منتخب</span>
+                </div>
+                <span class="flex items-center gap-1 text-slate-600 border border-gray-200 rounded-full pr-2 py-0.5 text-xs w-max">
+                  عملکرد <span class="bg-green-100 px-2 py-0.5 rounded-full text-green-600 font-bold">عالی</span>
+                </span>
+              </div>
+            </a>
+            <div class="flex flex-col gap-4">
+              <div class="flex gap-3 items-start">
+                <div class="icon-circle"><i class="fa fa-wallet text-sm"></i></div>
+                <div class="flex flex-col gap-1">
+                  <span class="text-slate-700 font-bold text-sm">روش‌ها و هزینه‌های ارسال</span>
+                  <span class="text-slate-500 text-xs flex items-center gap-1.5"><i class="fa fa-shipping-fast"></i>توسط نیوکالا</span>
+                  <span class="text-slate-500 text-xs flex items-center gap-1.5"><i class="fa fa-tachometer-alt"></i>ارسال در نیوکالا</span>
+                </div>
+              </div>
+              <div class="flex gap-3 items-start">
+                <div class="icon-circle"><i class="fa fa-star text-sm"></i></div>
+                <div class="flex flex-col gap-1">
+                  <span class="text-slate-700 font-bold text-sm">ویژه اعضای ویژه سایت</span>
+                  <span class="text-slate-500 text-xs">ارسال سریع و رایگان نیوکالا (قم)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-row justify-between border-t border-gray-100 pt-4">
+            <button class="bg-red-600 px-5 py-2.5 text-white rounded-xl text-sm"
+              id="btn-add-product-to-order" onclick="addToOrder({{ product.id }})">
+              افزودن به سبد خرید
+            </button>
+            <div class="flex flex-col justify-center items-end gap-1">
+              <div class="flex items-center gap-1">
+                {% if product.discount.is_active %}
+                  <span class="bg-red-600 text-white px-2 py-0.5 rounded-md text-xs font-bold">{{ product.discount.discount_value }}%</span>
+                  <span class="text-xs text-gray-400 line-through font-medium">{{ product.price|three_digits_currency }} تومان</span>
+                {% endif %}
+              </div>
+              <span class="text-sm font-bold text-slate-800 whitespace-nowrap">
+                {% if product.discount.is_active %}{{ product.final_price|three_digits_currency }}{% else %}{{ product.price|three_digits_currency }}{% endif %} تومان
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- STICKY NAV -->
+<section class="sticky-nav hidden md:block px-3 sticky  px-1 w-full  z-50 animate-fade-up py-0.5 left-0 right-0" style="top: 13%;border-top: 1px solid #f0f0f0;">
+    <div class="hidden md:flex items-center gap-1 px-1">
+        {% if product.description %}
+            <div class="nav-item-product flex flex-col gap-1 cursor-pointer px-3 py-0.5" data-target="description-product">
+                <h2 class="text-sm font-bold nav-title">معرفی</h2>
+                <span class="bg-red-600 rounded-2xl py-0.5 w-full nav-border hidden"></span>
+            </div>
+        {% endif %}
+        <div class="nav-item-product flex flex-col gap-1 cursor-pointer px-3 py-2.5" data-target="information-product">
+            <h2 class="text-sm font-bold nav-title">مشخصات کالا</h2>
+            <span class="bg-red-600 rounded-2xl py-0.5 w-full nav-border hidden"></span>
+        </div>
+        <div class="nav-item-product flex flex-col gap-1 cursor-pointer px-3 py-2.5" data-target="slider_mobile_comments">
+            <h2 class="text-sm font-bold nav-title">نظرات کاربران</h2>
+            <span class="bg-red-600 rounded-2xl py-0.5 w-full nav-border hidden"></span>
+        </div>
+        {% if product_by_categories %}
+            <div class="nav-item-product flex flex-col gap-1 cursor-pointer px-3 py-2.5" data-target="same-product-item">
+                <h2 class="text-sm font-bold nav-title">کالاهای مشابه</h2>
+                <span class="bg-red-600 rounded-2xl py-0.5 w-full nav-border hidden"></span>
+            </div>
+        {% endif %}
+    </div>
+</section>
+    {% if product.description %}
+        <!--Description Of Product -->
+        <section class="flex flex-col gap-3 m-3 px-5 animate-fade-up py-5 overflow-hidden section-card mt-3 rounded-2xl" id="description-product">
+          <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+            <span class="section-title text-slate-700 font-bold text-base">معرفی</span>
+          </div>
+          <div class="flex items-center pt-2">
+            <p class="text-slate-700 text-sm text-right text-justify line-clamp-4" id="description">{{ product.description }}</p>
+          </div>
+          <div class="flex items-center cursor-pointer" onclick="showAllDescription()">
+            <span style="color: #1672dd" class="text-sm" id="show-description-btn">بیشتر</span>
+            <i class="fa fa-arrow-left text-sm" style="color: #1672dd" ></i>
+          </div>
+        </section>
+    {% endif %}
+
+    <!-- FULL SPECS desktop -->
+    <section class="hidden md:flex flex-col gap-3 m-3 px-5 animate-fade-up py-5 overflow-hidden section-card mt-3 rounded-2xl" id="information-product">
+      <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+        <span class="section-title text-slate-700 font-bold text-base">مشخصات و بررسی کالا</span>
+      
+
+       
+        <span class="flex items-center cursor-pointer gap-1 font-bold text-red-600 text-xs" id="show-info-product" onclick="showInformation()">
+          مشاهده همه <i class="fa fa-arrow-left"></i>
+        </span>
+      </div>
+      <div class="flex flex-row items-start gap-10 pt-2">
+    <div class="w-full">
+        {% regroup specifications by attribute.group.title as groups %}
+
+        {% for group in groups|slice:":1" %}
+            <div class="flex flex-col md:flex-row md:gap-10 gap-3 mb-6">
+
+                <span class="text-slate-700 h-max text-sm font-bold md:text-base whitespace-nowrap md:w-[18%] ">
+                    {{ group.grouper }}
+                </span>
+
+                <div class="flex flex-col gap-1 md:w-full">
+
+                    {% for item in group.list|slice:":4" %}
+                        <div class="spec-tr flex items-stretch gap-5 text-right border-b border-slate-100">
+
+                            <div class="spec-th text-slate-400 w-32 text-xs md:text-sm px-3 py-2">
+                                {{ item.attribute.title }}
+                            </div>
+
+                            <div class="flex flex-col gap-1 flex-1 pr-2 text-xs md:text-sm py-2 px-1 text-slate-700 font-medium">
+                                {% for v in item.values.all %}
+                                    <span>{{ v.value }}</span>
+                                {% endfor %}
+                            </div>
+
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+        {% endfor %}
+    </div>
+</div>
+    </section>
+
+    <!-- COMMENTS -->
+    <section class="px-3 animate-fade-up mt-3">
+      <div class="section-card px-5 py-5 rounded-2xl" id="slider_mobile_comments">
+        <div class="flex items-start justify-between mb-4" id="newComment">
+          <h2 class="section-title text-base font-bold text-slate-700">نظرات کاربران</h2>
+          <span class="flex items-center cursor-pointer gap-1 font-bold text-red-600 text-xs" id="show-all-comment" onclick="showComment()">
+            مشاهده همه <i class="fa fa-arrow-left"></i>
+          </span>
+        </div>
+        <div class="flex flex-col gap-4 md:flex-row">
+          <!-- mobile comments swiper -->
+          <div class="mySwiper pt-2 overflow-hidden md:hidden">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide !w-auto overflow-hidden">
+                <div class="flex gap-3 items-center" id="content-comments-mobile">
+                  {% include 'product_module/component/comments_mobile.html' with comments=comments %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- write comment CTA -->
+          <div class="flex md:sticky md:top-[180px] md:cursor-pointer items-start section-card hover:shadow-md h-max md:w-[38%] lg:w-[28%] md:mt-2 rounded-2xl px-4 py-4 gap-3" id="show-send-comment-box">
+            <div class="icon-circle"><i class="fa fa-comment"></i></div>
+            <div class="flex flex-col gap-2 flex-1">
+              <div class="flex items-center justify-between w-full">
+                <span class="text-sm text-slate-700 font-bold">دیدگاه خود را بنویسید</span>
+                <i class="fa fa-chevron-left text-xs text-gray-400"></i>
+              </div>
+              {% if user.is_authenticated %}
+                <span class="text-xs text-gray-500 leading-relaxed">با ثبت نظر به دیگران کمک کنید تا خریدی مطمئن انجام دهند</span>
+                <button class="border hidden md:inline border-red-500 w-full py-2 text-center text-red-600 rounded-xl bg-white hover:bg-red-50 font-bold text-sm transition">ثبت دیدگاه</button>
+              {% else %}
+                <span class="text-xs text-gray-500">برای ثبت نظر در سایت ثبت‌نام کنید</span>
+                <a href="{% url 'register_page' %}" class="border hidden md:inline border-red-500 w-full py-2 text-center text-red-600 rounded-xl bg-white hover:bg-red-50 font-bold text-sm transition">ثبت‌نام</a>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- desktop comments -->
+          <div class="md:flex flex-col w-full gap-3 pt-2 hidden" id="content-comments">
+            {% if comments %}
+              {% include 'product_module/component/comment.html' with comments=comments %}
+            {% else %}
+              <p class="bg-red-50 border border-red-100 text-red-600 px-4 py-3 text-sm font-medium rounded-xl">نظری برای این محصول درج نشده است — شما اولین نفر باشید</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- all comments overlay -->
+    <section class="fixed hidden top-0 animate-fade-up right-0 left-0 bottom-0 bg-white z-50" id="all-comment">
+        {% include 'product_module/component/all_comments.html' with comments=comments comments_count=comments_count %}
+    </section>
+
+    <!-- submit comment overlay -->
+    {% if request.user.is_authenticated %}
+    <section class="fixed hidden w-full top-0 animate-fade-up z-50 md:bg-[#0000004d] h-full backdrop-blur-sm" id="send-comment-box">
+      <div class="flex items-end md:items-center h-full justify-center w-full">
+        <form method="post" id="comment-form"
+          class="flex h-full md:h-max md:w-[50%] lg:w-[37%] md:rounded-2xl bg-white px-5 py-6 w-full flex-col gap-5 shadow-2xl">
+          {% csrf_token %}
+          <div class="flex items-center gap-3 border-b border-gray-100 pb-3">
+            <button type="button" class="close-btn" id="close-send-comment-box" onclick="closeSendCommentBox()">
+              <i class="fa fa-arrow-right text-sm"></i>
+            </button>
+            <h3 class="text-base text-slate-700  font-bold">ثبت دیدگاه</h3>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+            <img src="{{ product.image.url }}" class="w-14 h-14 object-contain" alt="{{ product.title_fa }}">
+            <p class="text-sm text-slate-700 font-medium">{{ product.title_fa }}</p>
+          </div>
+          <div class="flex flex-col gap-3">
+            <h3 class="text-slate-700 font-bold text-sm">ثبت امتیاز</h3>
+            <div class="flex gap-2 " id="stars">
+                {% comment %} <button type="button" tabindex="{{ rating }}" class="rating-btn" onclick="setRating({{ rating }})">{{ rating }}</button> {% endcomment %}
+                <img src="{% static "img/star-svgrepo-com (1).svg"%}"  class="w-7">
+                <img src="{% static "img/star-svgrepo-com (1).svg"%}"  class="w-7">
+                <img src="{% static "img/star-svgrepo-com (1).svg"%}"  class="w-7">
+                <img src="{% static "img/star-svgrepo-com (1).svg"%}"  class="w-7">
+                <img src="{% static "img/star-svgrepo-com (1).svg"%}"  class="w-7">
+
+            </div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <h3 class="text-slate-700 font-bold text-sm">متن دیدگاه</h3>
+            {{ comment_form.comment_value }}
+            {{ comment_form.comment }}
+            {{ comment_form.errors }}
+              <input type="hidden" name="rating" value="" id="star-count">
+              <span class="text-sm text-red-600 font-bold" id="error-comment"></span>
+          </div>
+
+          <button type="submit" class="w-full py-3 rounded-xl text-white bg-red-600 font-bold text-sm hover:bg-red-700 transition shadow-sm">ثبت دیدگاه</button>
+        </form>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- similar products -->
+    {% if product_by_categories %}
+      <section class="mb-[80px] px-3 animate-fade-up mt-3" id="same-product-item">
+        <div class="section-card px-5 py-5 rounded-2xl">
+          <div class="flex items-start justify-between mb-3">
+            <h2 class="section-title text-base font-bold text-slate-700">کالاهای مشابه</h2>
+          </div>
+          <div class="mySwiper pt-2 overflow-hidden">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide !w-auto overflow-hidden">
+                <div class="flex gap-3 items-center">
+                  {% include 'home_module/includes/product.html' with products=product_by_categories %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    {% endif %}
+
+    <!-- mobile buy bar -->
+    <div class="mobile-buy-bar flex md:hidden animate-fade-up flex-row justify-between h-[64px] px-4 py-2 fixed bottom-0 right-0 left-0 z-20">
+      <button class="bg-red-600 px-5 py-2.5 text-white rounded-xl text-sm font-bold" onclick="addToOrder({{ product.id }})">افزودن به سبد خرید</button>
+      <div class="flex flex-col justify-center items-end">
+        <div class="flex items-center gap-1">
+          {% if product.discount.is_active %}
+            <span class="bg-red-600 text-white px-2 py-0.5 rounded-md text-sm font-bold">{{ product.discount.discount_value }}%</span>
+            <span class="text-sm text-gray-400 line-through">{{ product.price|three_digits_currency }} تومان</span>
+          {% endif %}
+        </div>
+
+          {% if product.final_price != 'None' %}
+            <span class="text-slate-800 text-sm font-extrabold text-end">{{ product.final_price|three_digits_currency }} تومان</span>
+            {% else %}
+              <span class="text-slate-800 text-sm font-extrabold text-end">{{ product.price|three_digits_currency }} تومان</span>
+          {% endif %}
+
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

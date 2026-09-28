@@ -1,0 +1,563 @@
+{% extends 'shared/layout.html' %}
+{% load poll_extras %}
+{% load widget_tweaks %}
+{% load static %}
+{% block title %}
+  پنل کاربری
+{% endblock %}
+
+{% block content %}
+  <div class="main-wrap profile-container">
+    <div class="layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar mt-5">
+        <!-- user card -->
+        <div class="user-card">
+          <div class="avatar-wrap">
+              <form action="" method="post" id="avatar-form" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="avatar relative cursor-pointer">
+                      {% if current_user.avatar %}
+                          <img src="{{ current_user.avatar.url }}" class="w-full h-full rounded-full"  alt="user-icon">
+                          {% else %}
+                            <img src="{% static 'img/profile-img-default.png' %}" alt="user-icon">
+                      {% endif %}
+                      <label class="w-full h-full absolute top-0 right-0 left-0 bottom-0 z-20 cursor-pointer" for="{{ avatar_form.avatar.id_for_label }}"></label>
+                      {{ avatar_form.avatar }}
+                      <input type="hidden" name="action" value="edit_avatar">
+                  </div>
+              </form>
+            <div class="avatar-edit">
+              <i class="fas fa-camera"></i>
+            </div>
+          </div>
+          <div class="user-name">
+              {% if current_user.get_full_name %}
+                {{ current_user.get_full_name }}
+                {% else %}
+                  کاربر دیجیکالا
+              {% endif %}
+          </div>
+          <div class="user-phone">
+              {% if current_user.number %}
+                {{ current_user.number }}
+                  {% else %}
+                  {{ current_user.email }}
+              {% endif %}
+          </div>
+        </div>
+
+        <!-- nav -->
+        <nav class="nav-menu">
+          <div class="nav-item text-xs px-2 py-2 active" onclick="showPanel('account')">
+            <div class="icon">
+              <i class="fas fa-user"></i>
+            </div>اطلاعات حساب
+          </div>
+          <div class="nav-item text-xs px-2 py-2" onclick="showPanel('orders')">
+            <div class="icon">
+              <i class="fas fa-box"></i>
+            </div>سفارش‌های من
+
+          </div>
+          <div class="nav-item text-xs px-2 py-2" onclick="showPanel('addresses')">
+            <div class="icon">
+              <i class="fas fa-location-dot"></i>
+            </div>آدرس‌های من
+          </div>
+          <div class="nav-item text-xs px-2 py-2" onclick="showPanel('wishlist')">
+            <div class="icon">
+              <i class="fas fa-heart"></i>
+            </div>علاقه‌مندی‌ها
+
+          </div>
+          <div class="nav-item text-xs px-2 py-2" onclick="showPanel('comments')" style="border-bottom:none">
+            <div class="icon">
+              <i class="fas fa-comment"></i>
+            </div>نظرات من
+          </div>
+          <div class="nav-logout">
+            <div class="icon">
+              <i class="fas fa-right-from-bracket"></i>
+            </div>
+              <div class="">
+                  <a href="{% url 'logout_page' %}">خروج از حساب</a>
+              </div>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- CONTENT -->
+      <main class="content mt-32 md:mt-5">
+        <!-- STATS BAR (always visible) -->
+        <div class="stats-bar anim">
+          <div class="stat-item">
+            <div class="stat-num">{{ count_bought_product }}</div>
+            <div class="stat-lbl">سفارش</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">{{ favorite_products.count }}</div>
+            <div class="stat-lbl">علاقه‌مندی</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">{{ count_user_comment }}</div>
+            <div class="stat-lbl">نظر</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">{{ get_addresses.count }}</div>
+            <div class="stat-lbl">آدرس</div>
+          </div>
+        </div>
+        <!-- messages -->
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="message-box message-box-success slideUp flex fixed bottom-[62px] left-0 right-0 md:bottom-[20%] md:left-[47%] md:right-[29%] z-20 alert-box md:w-max" >
+                {% endif %}
+                {% if message.tags == 'error' %}
+                    <div class="message-box message-box-error slideUp flex fixed bottom-[62px] left-0 right-0 md:bottom-[20%] md:left-[47%] md:right-[29%] z-20  alert-box md:w-max">
+                {% endif %}
+                {% if message.tags == 'warning' %}
+                    <div class="message-box message-box-warning slideUp flex fixed bottom-[62px] left-0 right-0 md:bottom-[20%] md:left-[47%] md:right-[29%] z-20  alert-box md:w-max">
+                {% endif %}
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <!-- ── ACCOUNT PANEL ── -->
+        <div class="panel-section active anim" id="panel-account">
+          <div class="section-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fas fa-user" style="color: #e63946;"></i> اطلاعات حساب کاربری
+              </div>
+              <a href="#" class="card-link" onclick="openModal('modal-edit-account');return false;"><i class="fas fa-pen" style="font-size:.65rem"></i> ویرایش</a>
+            </div>
+            <div class="info-grid">
+              <div class="info-field">
+                <div class="field-label">
+                    {{ profile_form.first_name.label }} و {{ profile_form.last_name.label }}
+                </div>
+                {% if current_user.get_full_name %}
+                    <div class="field-value">{{ current_user.get_full_name }}</div>
+                    {% else %}
+                    <div class="field-value" style="direction:ltr;text-align:right">وارد نشده</div>
+                {% endif %}
+              </div>
+              <div class="info-field">
+                <div class="field-label">{{ profile_form.number.label }}</div>
+                {% if current_user.number %}
+                    <div class="field-value" style="direction:ltr;text-align:right">{{ current_user.number }}</div>
+                    {% else %}
+                    <div class="field-value" style="direction:ltr;text-align:right">وارد نشده</div>
+                {% endif %}
+              </div>
+              <div class="info-field">
+                <div class="field-label">{{ profile_form.email.label }}</div>
+                {% if current_user.email %}
+                    <div class="field-value" style="direction:ltr;text-align:right">{{ current_user.email }}</div>
+                    {% else %}
+                    <div class="field-value" style="direction:ltr;text-align:right">وارد نشده</div>
+                {% endif %}
+              </div>
+              <div class="info-field">
+                <div class="field-label">{{ profile_form.meli_code.label }}</div>
+                  {% if current_user.meli_code %}
+                      <div class="field-value">{{ current_user.meli_code }}</div>
+                      {% else %}
+                      <div class="field-value">وارد نشده</div>
+                  {% endif %}
+              </div>
+              <div class="info-field">
+                <div class="field-label">{{ profile_form.birthday.label }}</div>
+                    {% if current_user.birthday %}
+                      <div class="field-value">{{ current_user.birthday|jalali_date }}</div>
+                      {% else %}
+                      <div class="field-value">وارد نشده</div>
+                  {% endif %}
+              </div>
+              <div class="info-field">
+                <div class="field-label">{{ profile_form.gender.label }}</div>
+                    {% if current_user.gender %}
+                      <div class="field-value">{{ current_user.get_gender_display }}</div>
+                      {% else %}
+                      <div class="field-value">وارد نشده</div>
+                  {% endif %}
+              </div>
+            </div>
+            <button class="edit-btn" onclick="openModal('modal-edit-account')"><i class="fas fa-pen"></i> ویرایش اطلاعات</button>
+          </div>
+
+            <form action="" method="post">
+                {% csrf_token %}
+                <div class="section-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fas fa-lock" style="color: #e63946;"></i> تغییر رمز عبور
+              </div>
+            </div>
+            <div style="padding:16px 18px;display:flex;flex-direction:column;gap:10px;">
+              <div>
+                <label for="{{ password_form.current_password.id_for_label }}" class="field-label" style="margin-bottom:6px">{{ password_form.current_password.label }}</label>
+                  {{ password_form.current_password|add_class:'form-password' }}
+                  {{ password_form.current_password.errors }}
+              </div>
+              <div>
+                <label for="{{ password_form.new_password.id_for_label }}" class="field-label" style="margin-bottom:6px">{{ password_form.new_password.label }}</label>
+                  {{ password_form.new_password|add_class:'form-password' }}
+                  {{ password_form.new_password.errors }}
+
+              </div>
+              <div>
+                <label for="{{ password_form.confirm_new_password.id }}" class="field-label" style="margin-bottom:6px">{{ password_form.confirm_new_password.label }}</label>
+                  {{ password_form.confirm_new_password|add_class:'form-password' }}
+                  {{ password_form.confirm_new_password.errors }}
+
+              </div>
+                <button type="submit" name="action" value="change_password" style="width:fit-content;padding:9px 22px;background:var(--red);color:white;border:none;border-radius:var(--radius-sm);font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer">ذخیره رمز عبور</button>
+            </div>
+          </div>
+            </form>
+        </div>
+
+        <!-- ── ORDERS PANEL ── -->
+        <div class="panel-section" id="panel-orders">
+          <div class="section-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fas fa-box" style="color: #e63946;"></i> سفارش‌های من
+              </div>
+              <a href="#" class="card-link" onclick="showAllOrders();return false;">مشاهده همه <i class="fas fa-chevron-left" style="font-size:.6rem"></i></a>
+            </div>
+
+            {% if bought_products %}
+                {% for bought_product in bought_products %}
+                    <div class="order-item">
+                      <img class="order-thumb" src="{{ bought_product.product.image.url }}">
+                      <div class="order-info">
+                        <div class="order-title">{{ bought_product.product.title_fa }}</div>
+                        <div class="order-meta">
+                          <span class="order-date">{{ bought_product.order.payment_date|jalali_date }}</span>
+
+                        </div>
+                      </div>
+                      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+                        <span class="status-pill  {% if bought_product.status == 'paid' %} status-paid {% else %} status-delivered {% endif %}">{{ bought_product.get_status_display }}</span>
+                        <span class="order-price">{{ bought_product.final_price }} تومانءء</span>
+                      </div>
+                    </div>
+                {% endfor %}
+                {% else %}
+                   <div class="flex flex-col justify-center items-center w-full py-3">
+                       <img src="{% static 'img/order-empty.svg' %}" alt="order-empty-icon">
+                       <span class="card-title">هنوز هیچ سفارشی ندادید</span>
+                   </div>
+            {% endif %}
+
+
+
+          </div>
+        </div>
+
+        <!-- ── ADDRESSES PANEL ── -->
+        <div class="panel-section" id="panel-addresses">
+          <div class="section-card" id="my-address">
+              {% include 'profile_module/component/my_address.html' %}
+          </div>
+        </div>
+
+        <!-- ── WISHLIST PANEL ── -->
+        <div class="panel-section" id="panel-wishlist">
+          <div class="section-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fas fa-heart" style="color: #e63946;"></i> علاقه‌مندی‌های من
+              </div>
+
+            </div>
+            <div class="" id="wishlist">
+                {% include 'profile_module/component/wishes.html' with favorite_products=favorite_products %}
+            </div>
+          </div>
+        </div>
+
+        <!-- ── COMMENTS PANEL ── -->
+        <div class="panel-section" id="panel-comments">
+          <div class="section-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fas fa-comment" style="color: #e63946;"></i> نظرات من
+              </div>
+              <span style="font-size:.75rem;color:var(--text-3)">{{ count_user_comment }} نظر</span>
+            </div>
+
+            {% if user_comments %}
+                {% for user_comment in user_comments %}
+                  <div class="comment-item">
+                      <div class="comment-header">
+                        <div class="comment-product line-clamp-2">{{ user_comment.product.title_fa }}</div>
+                        <div class="comment-date">{{ user_comment.created_date|jalali_date }}</div>
+                      </div>
+                      <div class="stars">
+                          {% for i in "12345" %}{% if forloop.counter <= user_comment.rating %}
+                            <img src="{% static "img/star-svgrepo-com.svg" %}" class="w-5 h-5" alt="star-icon">
+                          {% endif %}{% endfor %}
+
+                      </div>
+                      <div class="comment-text">{{ user_comment.text }}</div>
+                      <span class="comment-status {% if user_comment.status == 'approved' %} cstatus-approved {% elif user_comment.status == 'pending' %} cstatus-pending {% else %} cstatus-rejected {% endif %}"><i class="fas fa-check" style="font-size:.6rem"></i>{{ user_comment.get_status_display }}</span>
+                  </div>
+                {% endfor %}
+                      {% else %}
+                     <div class="flex flex-col justify-center items-center w-full py-3">
+                       <img src="{% static 'img/order-empty.svg' %}" alt="order-empty-icon">
+                       <span class="card-title">هنوز هیچ نظری ندارید</span>
+                   </div>
+            {% endif %}
+
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mobile-bottom-nav">
+    <div class="mob-nav-inner">
+      <div class="mob-nav-btn active" onclick="showPanel('account');setMobActive(this)">
+        <i class="fas fa-user text-xs flex flex-col justify-center gap-1" style="width: 22px; height: 21px;"></i> حساب
+      </div>
+      <div class="mob-nav-btn" onclick="showPanel('orders');setMobActive(this)">
+        <i class="fas fa-box text-xs flex flex-col justify-center gap-1" style="width: 22px; height: 21px;"></i> سفارش‌ها
+      </div>
+      <div class="mob-nav-btn" onclick="showPanel('addresses');setMobActive(this)">
+        <i class="fas fa-location-dot text-xs flex flex-col justify-center gap-1" style="width: 22px; height: 21px;"></i> آدرس‌ها
+      </div>
+      <div class="mob-nav-btn" onclick="showPanel('wishlist');setMobActive(this)">
+        <i class="fas fa-heart text-xs flex flex-col justify-center gap-1" style="width: 22px; height: 21px;"></i> علاقه‌مندی
+      </div>
+      <div class="mob-nav-btn" onclick="showPanel('comments');setMobActive(this)">
+        <i class="fas fa-comment text-xs flex flex-col justify-center gap-1" style="width: 22px; height: 21px;"></i> نظرات
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══ MODAL: ویرایش اطلاعات ══ -->
+    <form action="" method="post">
+    {% csrf_token %}
+        <div class="modal-overlay" id="modal-edit-account">
+            <div class="modal-box">
+              <div class="modal-header">
+                <div class="modal-title">
+                  <i class="fas fa-user-pen" style="color: #e63946;"></i> ویرایش اطلاعات حساب
+                </div>
+                <button type="button" class="modal-close" onclick="closeModal('modal-edit-account')"><i class="fas fa-times"></i></button>
+              </div>
+              <div class="modal-body">
+                <div class="form-row">
+                  <div class="form-group">
+                      <div class="flex items-center gap-1">
+                          <label for="{{ profile_form.first_name.id_for_label  }}" class="form-label">{{ profile_form.first_name.label }}</label>
+                      </div>
+                      {{ profile_form.first_name|add_class:"form-input" }}
+                  </div>
+                  <div class="form-group">
+                      <div class="flex items-center gap-1">
+                          <label for="{{ profile_form.last_name.id_for_label  }}" class="form-label">{{ profile_form.last_name.label }}</label>
+                      </div>
+                      {{ profile_form.last_name|add_class:"form-input" }}
+                  </div>
+                 <div class="form-group">
+                      <div class="flex items-center gap-1">
+                          <label for="{{ profile_form.number.id_for_label  }}" class="form-label">{{ profile_form.number.label }}</label>
+                      </div>
+                      {{ profile_form.number|add_class:"form-input" }}
+                  </div>
+                  <div class="form-group">
+                      <div class="flex items-center gap-1">
+                          <label for="{{ profile_form.email.id_for_label  }}" class="form-label">{{ profile_form.email.label }}</label>
+                      </div>
+{#                      {{ profile_form.email|add_class:"form-input" }}#}
+                      <span class="form-input">{{ request.user.email }}</span>
+                  </div>
+                  <div class="form-group">
+                      <div class="flex items-center gap-1">
+                          <label for="{{ profile_form.meli_code.id_for_label  }}" class="form-label">{{ profile_form.meli_code.label }}</label>
+                      </div>
+                      {{ profile_form.meli_code|add_class:"form-input" }}
+                  </div>
+                  <div class="form-group">
+                      <div class="flex items-center gap-1">
+                          <label for="{{ profile_form.birthday.id_for_label  }}" class="form-label">{{ profile_form.birthday.label }}</label>
+                      </div>
+                        {{ profile_form.birthday|add_class:"form-input" }}
+                        <input type="hidden" id="birthday-hidden">
+                        <input type="hidden" id="existing-birthday" value="{{ user.birthday|date:'Y-m-d' }}">
+                  </div>
+                  <div class="form-group">
+                      <div class="flex items-center gap-1">
+                          <label for="{{ profile_form.gender.id_for_label  }}" class="form-label">{{ profile_form.gender.label }}</label>
+                      </div>
+                      {{ profile_form.gender|add_class:"form-input" }}
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeModal('modal-edit-account')">انصراف</button>
+                <button class="btn-primary" name="action" value="edit_profile" type="submit"><i class="fas fa-check" style="margin-left:5px;font-size:.75rem"></i> ذخیره تغییرات</button>
+              </div>
+            </div>
+          </div>
+    </form>
+
+  <!-- ══ MODAL: افزودن آدرس ══ -->
+  <div class="modal-overlay" id="modal-add-address">
+    <form class="modal-box" method="post">
+        {% csrf_token %}
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fas fa-location-dot"></i> افزودن آدرس جدید
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-add-address')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ address.receiver_name.id_for_label }}" class="form-label">{{ address.receiver_name.label }}</label>
+            {{ address.receiver_name|add_class:"form-input" }}
+            {{ address.receiver_name.errors }}
+          </div>
+          <div class="form-group">
+            <label for="{{ address.mobile.id_for_label }}" class="form-label">{{ address.mobile.label }}</label>
+            {{ address.mobile|add_class:"form-input" }}
+                          {{ address.mobile.errors }}
+
+          </div>
+          <div class="form-group">
+            <label for="{{ address.province.id_for_label }}" class="form-label">{{ address.province.label }}</label>
+            {{ address.province|add_class:"form-input" }}
+            {{ address.province.errors }}
+          </div>
+          <div class="form-group">
+            <label for="{{ address.city.id_for_label }}" class="form-label">{{ address.city.label }}</label>
+              <div id="cities-list-input-add">
+              {% include 'profile_module/component/cities_list.html' %}
+              </div>
+              {{ address.city.errors }}
+
+          </div>
+          <div class="form-group full">
+            <label for="{{ address.full_address.id_for_label }}" class="form-label">{{ address.full_address.label }}</label>
+            {{ address.full_address|add_class:"form-input" }}
+                          {{ address.full_address.errors }}
+
+          </div>
+          <div class="form-group">
+            <label for="{{ address.postal_code.id_for_label }}" class="form-label">{{ address.postal_code.label }}</label>
+            {{ address.postal_code|add_class:"form-input" }}
+                          {{ address.postal_code.errors }}
+
+          </div>
+          <div class="form-group">
+            <label for="{{ address.title.id_for_label }}" class="form-label">{{ address.title.label }}</label>
+            {{ address.title|add_class:"form-input" }}
+                          {{ address.title.errors }}
+
+          </div>
+          <div class="form-group full" style="flex-direction:row;align-items:center;gap:10px">
+            {{ address.is_default }}
+                          {{ address.is_default.errors }}
+            <label for="chk-default" class="form-label" style="cursor:pointer;margin:0">{{ address.is_default.label }}</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" onclick="closeModal('modal-add-address')">انصراف</button>
+        <button type="submit" class="btn-primary"><i class="fas fa-plus" style="margin-left:5px;font-size:.75rem"></i> ذخیره آدرس</button>
+        <input type="hidden" name="action" value="address">
+      </div>
+    </form>
+  </div>
+  <!-- ══ MODAL: ویرایش آدرس ══  -->
+  <div class="modal-overlay" id="modal-edite-address">
+    <form class="modal-box" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="address_id" id="edit-address-id">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fas fa-location-dot"></i> ویرایش آدرس
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modal-edite-address')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">{{ address.receiver_name.label }}</label>
+            <input type="text" name="receiver_name" id="edit-receiver-name" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ address.mobile.label }}</label>
+            <input type="text" name="mobile" id="edit-mobile" class="form-input" placeholder="09xxxxxxxxx">
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ address.province.label }}</label>
+            {{ address.province|add_class:"form-input" }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ address.city.label }}</label>
+            <div id="cities-list-input-edit">
+              {% include 'profile_module/component/cities_list.html' %}
+            </div>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">{{ address.full_address.label }}</label>
+            <textarea name="full_address" id="edit-full-address" class="form-input"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ address.postal_code.label }}</label>
+            <input type="text" name="postal_code" id="edit-postal-code" class="form-input" placeholder="۱۰ رقم">
+          </div>
+          <div class="form-group">
+            <label class="form-label">{{ address.title.label }}</label>
+            <input type="text" name="title" id="edit-title" class="form-input" placeholder="منزل">
+          </div>
+          <div class="form-group full" style="flex-direction:row;align-items:center;gap:10px">
+            <input type="checkbox" name="is_default" id="edit-is-default">
+            <label for="edit-is-default" class="form-label" style="cursor:pointer;margin:0">{{ address.is_default.label }}</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" onclick="closeModal('modal-edite-address')">انصراف</button>
+        <button type="submit" class="btn-primary"><i class="fas fa-check" style="margin-left:5px;font-size:.75rem"></i> ذخیره آدرس</button>
+        <input type="hidden" name="action" value="edit_address">
+      </div>
+    </form>
+  </div>
+
+  <!-- ══ PANEL: همه سفارش‌ها (روی صفحه orders) ══ -->
+  <div class="modal-overlay" id="modal-all-orders">
+    <div class="modal-box" style="max-width:680px">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fas fa-box" style="color: #e63946;"></i> همه سفارش‌های من
+        </div>
+        <button class="modal-close" onclick="closeModal('modal-all-orders')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="filter-tabs">
+        <div class="filter-tab active" data-filter="all" onclick="setOrderTab(this)">همه</div>
+        {% for value,title in statuses %}
+            <div class="filter-tab" data-filter="{{ value }}" onclick="setOrderTab(this)">{{ title }}</div>
+        {% endfor %}
+
+{#        <div class="filter-tab" data-filter="paid" onclick="setOrderTab(this)">پرداخت شده</div>#}
+{#        <div class="filter-tab" data-filter="processing" onclick="setOrderTab(this)">در حال ارسال</div>#}
+{#        <div class="filter-tab" data-filter="canceled" onclick="setOrderTab(this)">لغو شده</div>#}
+      </div>
+      <!-- order list -->
+      <div id="all-orders-list" style="max-height:60vh;overflow-y:auto">
+        {% include 'profile_module/component/order_list.html' with all_bought_product=all_bought_product %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

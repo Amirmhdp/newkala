@@ -1,0 +1,19 @@
+{% load static %}
+{% if comments %}
+    {% for comment in comments %}
+      <div class="comment-card-item w-64 shrink-0" id="comment_mobile_{{ comment.id }}">
+        <div class="flex items-center gap-2 mb-2">
+          {% if comment.user.avatar %}<img src="{{ comment.user.avatar.url }}" class="w-11 h-11 rounded-full" alt="">{% endif %}
+          <span class="text-slate-700 font-bold text-sm">{{ comment.user.get_full_name }}</span>
+        </div>
+        <div class="flex items-center gap-0.5 mb-2">
+          {% for i in "12345" %}{% if forloop.counter <= comment.rating %}
+            <img src="{% static "img/star-svgrepo-com.svg" %}" class="w-5 h-5" alt="star-icon">
+          {% endif %}{% endfor %}
+        </div>
+        <p class="text-slate-600 text-sm line-clamp-3 leading-relaxed">{{ comment.text }}</p>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="bg-red-50 border border-red-100 text-red-600 px-4 py-2.5 text-sm font-medium rounded-xl">نظری برای این محصول درج نشده است — شما اولین نفر باشید</p>
+{% endif %}

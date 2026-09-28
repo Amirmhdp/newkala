@@ -1,0 +1,7 @@
+from django.apps import AppConfig
+
+
+class ProfileModuleConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'profile_module'
+    verbose_name = 'پروفایل'

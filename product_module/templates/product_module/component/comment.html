@@ -1,0 +1,52 @@
+{% load poll_extras %}
+{% load static %}
+
+{% for comment in comments|slice:":3" %}
+    {% if comments and comment.text and comment.created_date %}
+        <div
+            class="flex flex-col justify-center border w-full gap-2 h-max px-2 py-3 border-gray-300 rounded-md  shrink-0" id="comment_{{ comment.id }}">
+            <div class="flex flex-col justify-center gap-2">
+                <div class="flex items-center gap-2">
+                    {% if comment.user.avatar %}
+                        <img src="{{ comment.user.avatar.url }}" class="w-10" alt="">
+                    {% endif %}
+                    <span class="text-slate-700 font-bold text-base mt-2">{{ comment.user.get_full_name }}</span>
+                    <span class="text-slate-700 font-bold text-base mt-2 mr-3">{{ comment.created_date | jalali_date }}</span>
+                </div>
+                <div class="flex items-center gap-2 p-1">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= comment.rating %}
+                        <img src="{% static "img/star-svgrepo-com.svg" %}" class="w-5 h-5" alt="star-icon">
+                        {% endif %}
+                    {% endfor %}
+
+                </div>
+
+
+            </div>
+
+            <div class="flex items-center p-1">
+                <p class="text-slate-700 text-sm leading-loose">{{ comment.text }}</p>
+            </div>
+        </div>
+        {% for response in comment.comment_set.all %}
+            <div
+            class="flex flex-col justify-center border md:w-[96%] mr-[4%] w-full gap-2 h-max px-2 py-3 border-gray-300 rounded-md  shrink-0">
+                <div class="flex flex-col justify-center gap-2">
+                    <div class="flex items-center gap-2">
+                        {% if response.user.avatar %}
+                            <img src="{{ response.user.avatar.url }}" class="w-10" alt="">
+                        {% endif %}
+                        <span class="text-slate-700 font-bold text-base mt-2">{{ response.user }}</span>
+                        <span class="text-slate-700 font-bold text-base mt-2 mr-3">12 مهر 1404</span>
+                    </div>
+
+                </div>
+                <div class="flex items-center p-1">
+                    <p class="text-slate-700 text-sm leading-loose">{{ response.text }}</p>
+                </div>
+            </div>
+        {% endfor %}
+
+    {% endif %}
+{% endfor %}

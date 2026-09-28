@@ -1,0 +1,56 @@
+{% load static %}
+<div class="card-header">
+ <div class="card-title">
+    <i class="fas fa-location-dot" style="color: #e63946;"></i> آدرس‌های من
+  </div>
+</div>
+
+{% if get_addresses %}
+    {% for get_address in get_addresses %}
+        <div class="address-item">
+          <div class="address-row-top">
+            <div>
+              <div class="flex items-center gap-1">
+                  {% if get_address.is_default %}
+                      <div class="address-label">
+                        آدرس پیش‌فرض
+                      </div>
+                  {% endif %}
+              <div class="title-address">
+                  {{ get_address.title }}
+              </div>
+              </div>
+              <div class="address-text">{{ get_address.full_address }}</div>
+            </div>
+            <div class="address-actions">
+              <button type="button" class="icon-btn" onclick="openEditAddress(
+                  {{ get_address.id }},
+                  '{{ get_address.receiver_name|escapejs }}',
+                  '{{ get_address.mobile|escapejs }}',
+                  {{ get_address.province_id }},
+                  {{ get_address.city_id|default:'null' }},
+                  '{{ get_address.full_address|escapejs }}',
+                  '{{ get_address.postal_code|escapejs }}',
+                  '{{ get_address.title|escapejs }}',
+                  {{ get_address.is_default|yesno:'true,false' }}
+              )"><i class="fas fa-pen"></i></button>
+              <button type="button" class="icon-btn danger" onclick="deleteAddress({{ get_address.id }})"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="address-footer">
+            <div class="address-chip">
+              <i class="fas fa-phone"></i> {{ get_address.mobile }}
+            </div>
+            <div class="address-chip">
+              <i class="fas fa-envelope"></i> کد پستی: {{ get_address.postal_code }}
+            </div>
+          </div>
+        </div>
+    {% endfor %}
+    {% else %}
+       <div class="flex flex-col justify-center items-center w-full py-3">
+           <img src="{% static 'img/address.svg' %}" alt="favorite-icon">
+           <span class="card-title">هنوز آدرس ثبت نکرده اید</span>
+       </div>
+{% endif %}
+<button class="add-address-btn" onclick="openModal('modal-add-address')"><i class="fas fa-plus"></i> افزودن آدرس جدید</button>
