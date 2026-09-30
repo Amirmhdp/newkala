@@ -12,9 +12,9 @@
                     {% endif %}
                     <span
                         class="{% if not product.discount.is_active %}text-sm text-end text-gray-800{% endif %} font-bold {% if product.discount.is_active %}line-through text-xs{% endif %} text-gray-500 whitespace-nowrap">{{ product.price|three_digits_currency }}
-                        تومانءء</span>
+                        تومان</span>
                 </div>
-                {% if product.discount.is_active %}<span class="text-sm font-bold text-gray-800 whitespace-nowrap text-end ">{{ product.final_price|three_digits_currency }} تومانءء</span>{% endif %}
+                {% if product.discount.is_active %}<span class="text-sm font-bold text-gray-800 whitespace-nowrap text-end ">{{ product.final_price|three_digits_currency }} تومان</span>{% endif %}
             </div>
         </a>
     </div>

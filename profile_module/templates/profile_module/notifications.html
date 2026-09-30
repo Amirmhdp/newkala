@@ -3,7 +3,6 @@
 
 {% block content %}
 
-
 <main class="" style="background:#f2f4f8;">
   <div class=" mx-auto px-3 md:px-4 ">
 
@@ -12,20 +11,20 @@
       <h2 class="section-heading text-base font-bold text-slate-800">پیام‌ها</h2>
     </div>
 
-    {% if messages %}
+    {% if notifications %}
       <div class="section-card overflow-hidden">
-        {% for message in messages %}
+        {% for notification in notifications %}
           <div class="message-item">
 
-            <!-- avatar -->
-            {% if message.user.avatar %}
-              <img src="{{ message.user.avatar.url }}" class="message-avatar" alt="profile">
+            <!-- avatar (پیام‌ها مال خود کاربرند ⇒ user، بدون کوئری) -->
+            {% if user.avatar %}
+              <img src="{{ user.avatar.url }}" class="message-avatar" alt="profile">
             {% else %}
               <div class="message-avatar-fallback">
-                {% if message.user.get_full_name %}
-                  {{ message.user.get_full_name|first }}
+                {% if user.get_full_name %}
+                  {{ user.get_full_name|first }}
                 {% else %}
-                  {{ message.user.email|first|upper }}
+                  {{ user.email|first|upper }}
                 {% endif %}
               </div>
             {% endif %}
@@ -34,17 +33,13 @@
             <div class="flex flex-col flex-1 min-w-0">
               <div class="flex items-center justify-between gap-2">
                 <span class="message-sender">
-                  {% if message.user.get_full_name %}
-                    {{ message.user.get_full_name }}
-                  {% else %}
-                    {{ message.user.email }}
-                  {% endif %}
+                  {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.email }}{% endif %}
                 </span>
-                {% if message.created_at %}
-                  <span class="message-time">{{ message.created_at }}</span>
+                {% if notification.created_at %}
+                  <span class="message-time">{{ notification.created_at }}</span>
                 {% endif %}
               </div>
-              <p class="message-text">{{ message.text }}</p>
+              <p class="message-text">{{ notification.text }}</p>
             </div>
 
           </div>
@@ -54,8 +49,12 @@
     {% else %}
       <!-- empty state -->
       <div class="section-card flex flex-col items-center justify-center gap-3 py-16 px-6 text-center">
-        <img src="{{ image_error.image.url }}" class="w-44 opacity-60" alt="{{ image_error.title }}">
-        <span class="text-gray-500 font-semibold text-sm">{{ image_error.text }}</span>
+        {% if image_error %}
+          <img src="{{ image_error.image.url }}" class="w-44 opacity-60" alt="{{ image_error.title }}">
+          <span class="text-gray-500 font-semibold text-sm">{{ image_error.text }}</span>
+        {% else %}
+          <span class="text-gray-500 font-semibold text-sm">پیامی وجود ندارد</span>
+        {% endif %}
       </div>
     {% endif %}
 

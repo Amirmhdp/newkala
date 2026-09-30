@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.db.models import Sum
 # Create your models here.
 from account_module.models import User
 from product_module.models import Product
@@ -11,15 +11,10 @@ class Order(models.Model):
     payment_date = models.DateField(null=True, blank=True, verbose_name='تاریخ پرداخت')
 
     def get_total_price(self):
-        total = 0
-
-        for item in self.detailorder_set.all():
-            if self.is_paid:
-                total += item.final_price or 0
-            else:
-                total += item.count * item.product.final_price()
-
-        return total
+        if self.is_paid:
+            return self.detailorder_set.aggregate(total=Sum('final_price'))['total'] or 0
+        items = self.detailorder_set.select_related('product__discount')
+        return sum(item.count * item.product.final_price() for item in items)
 
     def __str__(self):
         if self.user.get_full_name():

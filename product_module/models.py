@@ -238,8 +238,6 @@ class ProductGallery(models.Model):
         verbose_name = 'گالری محصول'
         verbose_name_plural = 'گالری محصولات'
 
-from django.db import models
-
 class Favorite(models.Model):
     user = models.ForeignKey(
         User,
